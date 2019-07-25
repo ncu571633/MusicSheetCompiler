@@ -105,31 +105,19 @@ void preprocesor::convertPdf(char *filePath, char *fileName)
 }
 
 // entry point
-void preprocesor::convertIMG(std::string filePath)
+void preprocesor::convertIMG(std::string file)
 {
-    std::string fileName;
-	//remove path
-	char * pch = strtok (arg->ipath,"/");
-	while (pch != NULL)
-	{
-		pch = strtok (NULL, "/");
-		if(pch != NULL)
-			strcpy(fileName, pch);
-		else
-			strcpy(fileName, filePath);
-	}
-
-	//find out the last dot "."
-	char *pch1 = strstr (fileName, ".");
-	while(pch1 != NULL)
-	{
-		pch = pch1;
-		pch1 = strstr (pch1+1, ".");
-	}
-
-	if(strcmp(pch+1, "pdf")==0)
-	{
-		fprintf(stdout, "Begin to convert the pdf file: %s.\n", fileName);
+    std::size_t found = file.find_last_of("/\\");
+    std::string filePath = str.substr(0, found);
+    std::string fileFullName = str.substr(found+1);
+	
+    found = fileFullName.find_last_of("/\\");
+    std::string fileName = str.substr(0, found);
+    std::string fileExt = str.substr(found + 1);
+	    
+    if (fileExt == "pdf")
+    {
+        fprintf(stdout, "Begin to convert the pdf file: %s.\n", fileName);
 		rmTmpJpg();
 		strcpy(arg->fileName, "attach"); 
 		convertPdf(filePath, arg->fileName);
