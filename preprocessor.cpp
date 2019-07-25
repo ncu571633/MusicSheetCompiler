@@ -1,7 +1,7 @@
 #include <cstdio>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
 #include <sys/mman.h>
 #include <error.h>
 #include <errno.h>
@@ -13,14 +13,24 @@
 #include <string.h>
 #include <dirent.h>
 
+/*
+Input preprocesor:
+covert all input source into pgm format image
+*/
 
-void rmTmpJpg();
-int countPGM(char *filePath);
-// convert pdf file to .pgm
-void convertIMG(ARG *arg);
-void convertPdf(char *filePath, char *fileName);
+class preprocessor
+{
+    public:
+        static void rmTmpJpg();
+        static int countPGM(char *filePath);
+        
+        // convert pdf file to .pgm
+        static void convertIMG(ARG *arg);
+        static void convertPdf(std::string filePath, std::string fileName);
+};
 
-void rmTmpJpg()
+
+void preprocesor::rmTmpJpg()
 {
 	pid_t c;  
 	if ((c = fork()) < 0 )
@@ -43,7 +53,7 @@ void rmTmpJpg()
 }
 
 //if there are n pages in the pdf, n jpg files are generated
-int countPGM(char *filePath)
+int preprocesor::countPGM(char *filePath)
 {
 	struct dirent *entry;
 	DIR *dp;
@@ -69,11 +79,35 @@ int countPGM(char *filePath)
 	return count;
 }
 
-void convertIMG(ARG *arg)
-{//arg->ipath
-	char filePath[FILENAMEBUFFERSIZE];
-	char fileName[FILENAMEBUFFERSIZE];
-	strcpy(filePath, arg->ipath);
+
+
+//convert the file from .pdf to .pgm
+void preprocesor::convertPdf(char *filePath, char *fileName) 
+{
+	pid_t c;  
+	if ((c = fork()) < 0 )
+	{
+		perror("fork failed");
+		exit(1);
+	}
+
+	char outFile[FILENAMEBUFFERSIZE];
+	sprintf(outFile, "%s/%s%%d.pgm", TMPPATH, fileName);
+	if (!c)
+	{ 
+		fprintf(stdout, "Begin converting: %s -> %s\n", filePath, outFile);
+		execl("/usr/bin/convert", "convert", "-density", "256", "-compress", "none", filePath, outFile, NULL);
+		perror("execl() failure!\n\n");
+		_exit(1);
+	} 
+	else 
+		wait(NULL);
+}
+
+// entry point
+void preprocesor::convertIMG(std::string filePath)
+{
+    std::string fileName;
 	//remove path
 	char * pch = strtok (arg->ipath,"/");
 	while (pch != NULL)
@@ -86,7 +120,6 @@ void convertIMG(ARG *arg)
 	}
 
 	//find out the last dot "."
-//	printf ("fileName: %s\n",fileName);
 	char *pch1 = strstr (fileName, ".");
 	while(pch1 != NULL)
 	{
@@ -114,28 +147,4 @@ void convertIMG(ARG *arg)
 	fprintf(stderr, "Can't recognize file format: %s\n", pch+1);
 	exit(0);
 }
-
-//convert the file from .pdf to .pgm
-void convertPdf(char *filePath, char *fileName) 
-{
-	pid_t c;  
-	if ((c = fork()) < 0 )
-	{
-		perror("fork failed");
-		exit(1);
-	}
-
-	char outFile[FILENAMEBUFFERSIZE];
-	sprintf(outFile, "%s/%s%%d.pgm", TMPPATH, fileName);
-	if (!c)
-	{ 
-		fprintf(stdout, "Begin converting: %s -> %s\n", filePath, outFile);
-		execl("/usr/bin/convert", "convert", "-density", "256", "-compress", "none", filePath, outFile, NULL);
-		perror("execl() failure!\n\n");
-		_exit(1);
-	} 
-	else 
-		wait(NULL);
-}
-
 #endif
