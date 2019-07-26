@@ -14,7 +14,9 @@ CPPFLAGS = -Wall -g3 -std=c++11 #fpic
 # -L Specify library path
 # -WL,-rpath: specify library to exe loader
 ########################################################
-objects = main.o
+objects = \
+    preprocessor.o \
+    main.o
 
 all: $(objects)
 	$(CC) -o test $(objects) $(CPPFLAGS) -L./lib/ -Wl,-rpath=./lib/ $(LIBS)
