@@ -14,21 +14,7 @@
 #include <sys/wait.h>
 #include <dirent.h>
 
-/*
-Input preprocesor:
-covert all input source into pgm format image
-*/
-
-class preprocessor
-{
-    private:
-        template<typename... Args>
-        static void externalCall(Args... args);
-    
-    public:
-        static int countPGM(char *filePath);
-        static void convertIMG(std::string file);
-};
+#include "preprocessor.hpp"
 
 template<typename... Args>
 void preprocessor::externalCall(Args... args)
@@ -51,12 +37,12 @@ void preprocessor::externalCall(Args... args)
 }
 
 //if there are n pages in the pdf, n jpg files are generated
-int preprocessor::countPGM(char *filePath)
+int preprocessor::countPGM(std::string& filePath)
 {
 	struct dirent *entry;
 	DIR *dp;
 	 
-	dp = opendir(filePath);
+	dp = opendir(filePath.c_str());
 	if (dp == NULL) 
 	{
 		perror("opendir");
@@ -77,11 +63,11 @@ int preprocessor::countPGM(char *filePath)
 }
 
 // entry point
-void preprocessor::convertIMG(std::string file)
+void preprocessor::convertIMG(GlobalSetting& setting)
 {
-    std::size_t found = file.find_last_of("/\\");
-    std::string filePath = file.substr(0, found);
-    std::string fileFullName = file.substr(found+1);
+    std::size_t found = setting.file.find_last_of("/\\");
+    std::string filePath = setting.file.substr(0, found);
+    std::string fileFullName = setting.file.substr(found+1);
 	
     found = fileFullName.find_last_of("/\\");
     std::string fileName = fileFullName.substr(0, found);

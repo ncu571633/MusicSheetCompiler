@@ -8,14 +8,17 @@ class GlobalSetting
 {
     private:
         GlobalSetting() {}
-        static GlobalSetting* instance;
-        static std::unique_ptr<GlobalSetting> uniquePtrInstance;
 
     public:
-        static GlobalSetting* getInstance();
-        static std::unique_ptr<GlobalSetting> getUniquePtrInstance();
+        static GlobalSetting& getInstance()
+        {
+            static GlobalSetting g;
+            return g;
+        }    
 
         int totalPage;
+        std::string file;   // file full path
+        std::string fileName;
 };
 
 #endif

@@ -2,7 +2,7 @@
 CC = g++
 LIBS = -lMidi -lNetPbm
 
-CPPFLAGS = -Wall -g3 -std=c++11 #fpic
+CPPFLAGS = -Wall -g3 -std=c++14 #fpic
 #LDFLAGS = -shared
 
 # -c Compile or assemble the source files, but do not link.
