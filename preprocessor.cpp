@@ -65,15 +65,16 @@ int preprocessor::countPGM(std::string& filePath)
 // entry point
 void preprocessor::convertIMG(GlobalSetting& setting)
 {
-    std::size_t found = setting.file.find_last_of("/\\");
-    std::string filePath = setting.file.substr(0, found);
-    std::string fileFullName = setting.file.substr(found+1);
+    std::size_t found = setting.inputFile.find_last_of(SLASH);
+    std::string filePath = setting.inputFile.substr(0, found);
+    std::string fileFullName = setting.inputFile.substr(found+1);
 	
-    found = fileFullName.find_last_of("/\\");
+    found = fileFullName.find_last_of(".");
     std::string fileName = fileFullName.substr(0, found);
     std::string fileExt = fileFullName.substr(found + 1);
-	
-    std::cout << "Begin to convert input file: " + fileName + "\n";
+
+    setting.file = fileName + ".pbm";
+    std::cout << "Begin to convert input file: " + fileFullName + "\n";
     
     if (fileExt == "pgm")
     {
@@ -87,9 +88,8 @@ void preprocessor::convertIMG(GlobalSetting& setting)
 
     if (fileExt == "pdf")
     {
-		// strcpy(arg->fileName, "attach"); 
-
-		// execl("/usr/bin/convert", "convert", "-density", "256", "-compress", "none", filePath, outFile, NULL);
+        // convert -density 256 input output
+		externalCall("/usr/bin/convert", "convert", "-density", "256", setting.inputFile.c_str(), setting.file.c_str(), NULL);
 		// arg->imgNO = countPGM(TMPPATH);
 		return ;
 	}

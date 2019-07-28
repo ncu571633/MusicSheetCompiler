@@ -3,6 +3,8 @@
 
 #include <string>
 
+const std::string SLASH  = "/\\";
+
 // global variable, singleton
 class GlobalSetting 
 {
@@ -17,8 +19,9 @@ class GlobalSetting
         }    
 
         int totalPage;
-        std::string file;   // file full path
-        std::string fileName;
+        std::string inputFile;   // input file full path
+        std::string file;
+        std::string ext;
 };
 
 #endif
